@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Tile Matching Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Match the Tiles, Prashant! 💖</h1>
+        <div class="game-grid">
+            <!-- Initially hidden tiles for the game -->
+            <div class="tile" data-name="love"></div>
+            <div class="tile" data-name="heart"></div>
+            <div class="tile" data-name="hug"></div>
+            <div class="tile" data-name="kiss"></div>
+            <div class="tile" data-name="love"></div>
+            <div class="tile" data-name="heart"></div>
+            <div class="tile" data-name="hug"></div>
+            <div class="tile" data-name="kiss"></div>
+        </div>
+
+        <div id="popup-message" class="hidden">
+            <p id="message-text"></p>
+            <button id="close-popup" class="button">Close</button>
+        </div>
+
+        <!-- Audio elements for songs -->
+        <audio id="love-song" src="audio1.mp3"></audio>
+        <audio id="heart-song" src="audio2.mp3"></audio>
+        <audio id="hug-song" src="audio3.mp3"></audio>
+        <audio id="kiss-song" src="audio4.mp3"></audio>
+    </div>
+
+    <script>
+        // JavaScript for tile matching, pop-up messages, and playing songs
+        const tiles = document.querySelectorAll('.tile');
+        let flippedTile = null;
+        let matchedPairs = 0;
+        const popupMessage = document.getElementById('popup-message');
+        const messageText = document.getElementById('message-text');
+        const closePopup = document.getElementById('close-popup');
+
+        // Sweet messages for each match
+        const sweetMessages = [
+            "You're amazing, Prashant! 💕",
+            "Every moment with you is precious 💖",
+            "You light up my world 😘",
+            "You make my heart skip a beat 💓"
+        ];
+
+        // Emoji for each tile
+        const emojis = {
+            "love": "💖",
+            "heart": "💘",
+            "hug": "🤗",
+            "kiss": "💋"
+        };
+
+        // Audio elements for each match
+        const sounds = {
+            "love": document.getElementById('love-song'),
+            "heart": document.getElementById('heart-song'),
+            "hug": document.getElementById('hug-song'),
+            "kiss": document.getElementById('kiss-song')
+        };
+
+        tiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                if (tile.classList.contains('flipped')) return;
+                tile.classList.add('flipped');
+                tile.innerHTML = emojis[tile.dataset.name];  // Reveal the emoji
+
+                if (!flippedTile) {
+                    flippedTile = tile;
+                } else {
+                    if (flippedTile.dataset.name === tile.dataset.name) {
+                        showPopupMessage(sweetMessages[matchedPairs]);
+                        playSong(tile.dataset.name);  // Play song on correct match
+                        matchedPairs++;
+                        if (matchedPairs === 4) {
+                            showEndMessage();
+                        }
+                        flippedTile = null;
+                    } else {
+                        setTimeout(() => {
+                            tile.classList.remove('flipped');
+                            tile.innerHTML = '';  // Hide the emoji again
+                            flippedTile.classList.remove('flipped');
+                            flippedTile.innerHTML = '';
+                            flippedTile = null;
+                        }, 1000);
+                    }
+                }
+            });
+        });
+
+        closePopup.addEventListener('click', () => {
+            popupMessage.classList.add('hidden');
+            stopAllSongs();  // Stop the song when user closes the pop-up
+        });
+
+        function showPopupMessage(message) {
+            messageText.textContent = message;
+            popupMessage.classList.remove('hidden');
+        }
+
+        function playSong(name) {
+            // Stop any currently playing song
+            stopAllSongs();
+            // Play the song related to the matched tile
+            sounds[name].play();
+        }
+
+        function stopAllSongs() {
+            Object.values(sounds).forEach(audio => audio.pause());
+            Object.values(sounds).forEach(audio => (audio.currentTime = 0));
+        }
+
+        function showEndMessage() {
+            // Show final message after the last match
+            messageText.textContent = "You make my heart skip a beat 💓";
+            popupMessage.classList.remove('hidden');
+            closePopup.addEventListener('click', () => {
+                window.location.href = 'finish.html';
+            });
+        }
+    </script>
+</body>
+</html>
